@@ -1,66 +1,52 @@
-from kivy.app import App
 from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.uix.image import Image
-from kivy.uix.boxlayout import BoxLayout
+from kivy.app import App
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
 
+class MyGrid(GridLayout):                   # Main Grid Layout
+    def __init__(self, **kwargs):
+        super(MyGrid,self).__init__(**kwargs)
+        self.cols = 1                       # Main Grid Layout Config
+
+        self.inside = GridLayout()       # Inside Grid Item
+        self.inside.cols=2               # Inside Grid Item Config
+
+        self.inside.add_widget(Label(text='First Name'))
+        self.firstname = TextInput(multiline=False)
+        self.inside.add_widget(self.firstname)
+
+        self.inside.add_widget(Label(text='Last Name'))
+        self.lastname = TextInput(multiline=False)
+        self.inside.add_widget(self.lastname)
+
+        self.inside.add_widget(Label(text='Email '))
+        self.email = TextInput(multiline=False)
+        self.inside.add_widget(self.email)
+
+        self.add_widget(self.inside)      # Adding the inside grid as the first item of the main grid
+
+        self.submit = Button(text='Submit', font_size=20, pos_hint={'center_x':.1, 'center_y':.2})
+        self.submit.bind(on_press=self.pressed) # Binding button to the pressed function
+        self.add_widget(self.submit)
+
+    def pressed(self, instance):
+        firstName = self.firstname.text
+        lastName = self.lastname.text
+        email = self.email.text
+
+        print(f'Welcome Mr. {lastName}')
+        self.firstname.text = ''
+        self.lastname.text = ''
+        self.email.text = ''
+
+    
 class MainApp(App):
     def build(self):
-        self.operators = ["/", "*", "+", "-"]
-        self.last_was_operator = None
-        self.last_button = None
-
-        main_layout = BoxLayout(orientation='vertical')
-        self.solution  = TextInput(
-            multiline=False,
-            readonly=True,
-            halign="right",
-            font_size=55
-        )
-        main_layout.add_widget(self.solution)
-
-        buttons = [
-            ["7", "8", "9", "/"],
-            ["4", "5", "6", "*"],
-            ["1", "2", "3", "-"],
-            [".", "0", "C", "+"],
-        ]
-
-        for row in buttons:
-            h_layout = BoxLayout()
-            for label in row:
-                button = Button(
-                    text=label,
-                    pos_hint={'center_x':.5, 'center_y': .5},
-                )
-
-                button.bind(on_press= self.on_button_press)
-                h_layout.add_widget(button)
-            main_layout.add_widget(h_layout)
-
-        equals_button = Button(
-            text='=',
-            pos_hint={'center_x':.5, 'center_y':.5}
-        )
-
-        equals_button.bind(on_press=self.on_solution)
-        main_layout.add_widget(equals_button)
-        
-        return main_layout
-        
-    def on_button_press(self,instance):
-        current = self.solution.text
-        button_text = instance.text
-
-        if button_text == 'C':
-            # Clear the solution
-            self.solution = ""
-
-        else: 
-            if current and (self.last_was_operator and button_text in self.operators):
-                return
+        return MyGrid()
+    
 
 if __name__ == '__main__':
     app = MainApp()
     app.run()
+
